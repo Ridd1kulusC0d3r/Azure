@@ -1,0 +1,12 @@
+// HUNT-004
+// Goal: review high-severity alerts and recurring compromised entities.
+
+SecurityAlert
+| where TimeGenerated > ago(7d)
+| where AlertSeverity =~ "High"
+| summarize
+    AlertCount = count(),
+    Products = make_set(ProductName, 20),
+    Techniques = make_set(Techniques, 20)
+    by AlertName, CompromisedEntity
+| order by AlertCount desc
