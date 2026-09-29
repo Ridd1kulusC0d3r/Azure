@@ -1,0 +1,15 @@
+// Defender XDR Advanced Hunting
+// Goal: inspect recent high-severity alerts and ATT&CK techniques.
+
+AlertInfo
+| where Timestamp > ago(7d)
+| where Severity =~ "High"
+| project
+    Timestamp,
+    AlertId,
+    Title,
+    Category,
+    ServiceSource,
+    DetectionSource,
+    AttackTechniques
+| order by Timestamp desc
