@@ -1,0 +1,14 @@
+// HUNT-001
+// Goal: identify identities with concentrated failed Microsoft Entra sign-ins.
+// Validate thresholds against the target tenant before operational use.
+
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType != "0"
+| summarize
+    FailedSignIns = count(),
+    SourceIPs = make_set(IPAddress, 20),
+    Applications = make_set(AppDisplayName, 20)
+    by UserPrincipalName, bin(TimeGenerated, 15m)
+| where FailedSignIns >= 10
+| order by FailedSignIns desc
