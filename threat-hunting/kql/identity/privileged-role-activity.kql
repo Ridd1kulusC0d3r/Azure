@@ -1,0 +1,16 @@
+// HUNT-002
+// Goal: surface successful Entra role-management activity for analyst review.
+// Operation names vary by tenant and feature; baseline actual values before promotion.
+
+AuditLogs
+| where TimeGenerated > ago(24h)
+| where Category =~ "RoleManagement"
+| where Result =~ "success"
+| project
+    TimeGenerated,
+    OperationName,
+    InitiatedBy,
+    TargetResources,
+    LoggedByService,
+    CorrelationId
+| order by TimeGenerated desc
