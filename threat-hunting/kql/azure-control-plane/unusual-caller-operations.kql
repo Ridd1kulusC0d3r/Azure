@@ -1,0 +1,19 @@
+// HUNT-003
+// Goal: identify callers performing successful Azure control-plane operations
+// that were not observed during the preceding baseline window.
+
+let baseline_callers =
+    AzureActivity
+    | where TimeGenerated between (ago(14d) .. ago(1d))
+    | where ActivityStatusValue =~ "Success"
+    | summarize by Caller;
+AzureActivity
+| where TimeGenerated > ago(1d)
+| where ActivityStatusValue =~ "Success"
+| summarize
+    Operations = count(),
+    OperationTypes = make_set(OperationNameValue, 25),
+    ResourceGroups = make_set(ResourceGroup, 25)
+    by Caller
+| join kind=leftanti baseline_callers on Caller
+| order by Operations desc
